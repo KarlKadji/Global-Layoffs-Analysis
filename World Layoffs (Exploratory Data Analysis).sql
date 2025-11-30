@@ -6,61 +6,61 @@ from layoffs_staging2;
 select max(total_laid_off), max(percentage_laid_off)
 from layoffs_staging2;
 
--- this is telling me that the most amount of people laid off from a company was 12000 and that was 100% of the employees in the company
+-- This is telling me that the largest number of people laid off from a company was 12000, and that was 100% of the employees in the company
 
 select *
 from layoffs_staging2
 where percentage_laid_off = 1;
 
--- the results show that all these company have laid off 100% of their employees
+-- The results show that all these companies have laid off 100% of their employees
 
 select *
 from layoffs_staging2
 order by funds_raised_millions desc;
 
--- the results show the amount of funds raised by these companies in millions of dollars
+-- The results show the amount of funds raised by these companies in millions of dollars
 
 select *
 from layoffs_staging2
 where percentage_laid_off = 1
 order by funds_raised_millions desc;
 
--- the results show that Britishvolt was the highest fund raiser with a 100% layoff
+-- The results show that Britishvolt was the highest fundraiser with a 100% layoff
 
 select company, sum(total_laid_off)
 from layoffs_staging2
 group by company
 order by 2 desc;
 
--- the results show the sum of total lay offs by company. we can see amazon, google and meta are among the top 10
+-- The results show the sum of total layoffs by company. We can see Amazon, Google, and Meta are among the top 10
 
 select min(`date`), max(`date`)
 from layoffs_staging2;
 
--- i want to see the date range of these lay offs and it seems like its almost exacvtly 3 years from march 2020 to march 2023
--- good to remember these are peak covid times
+-- I want to see the date range of these lay-offs, and it seems like it's almost exactly 3 years from March 2020 to March 2023
+-- good to remember these are peak COVID times
 
 select industry, sum(total_laid_off)
 from layoffs_staging2
 group by industry
 order by 2 desc;
 
--- I can see that consumer, retail, transportation were all amongst the top 10 of most industry lay offs
--- this would make sense as during covid all of those industries financially regressed
+-- I can see that consumer, retail, and transportation were all amongst the top 10 of the most industry layoffs
+-- This would make sense, as during COVID, all of those industries financially regressed
 
 select country, sum(total_laid_off)
 from layoffs_staging2
 group by country
 order by 2 desc;
 
--- The united states is leading the table with the most amount of layoffs by far
+-- The United States is leading the table with the largest number of layoffs by far
 
 select year(`date`), sum(total_laid_off)
 from layoffs_staging2
 group by year(`date`)
 order by 1 desc;
 
--- the most amount of lay offs happened in 2022, then 2023.alter
+-- the largest number of lay-offs happened in 2022, then in 2023
 -- keep in mind this is only 3 months of data into 2023
 
 select stage, sum(total_laid_off)
@@ -68,14 +68,14 @@ from layoffs_staging2
 group by stage
 order by 2 desc;
 
--- most lay offs are coming from IPO's
+-- most layoffs are coming from IPO's
 
 select company, sum(percentage_laid_off)
 from layoffs_staging2
 group by company
 order by 2 desc;
 
--- percentage laid off is not very relevant because it is respective to each company
+-- The percentage laid off is not very relevant because it is specific to each company
 
 select substring(`date`,1,7) as `month`, sum(total_laid_off)
 from layoffs_staging2
@@ -83,7 +83,7 @@ where substring(`date`,1,7) is not null
 group by `month`
 order by 1 asc;
 
--- this is to see the total amount of lay offs per month
+-- This is to see the total amount of layoffs per month
 
 with rolling_total as
 (
@@ -96,23 +96,23 @@ order by 1 asc
 select `month`, total_off, sum(total_off) over(order by `month`) as ROLLING_TOTAL
 from rolling_total;
 
--- the rolling total results show that:
--- 2021 was the best year in terms of lay offs
--- the end of 2022 and beginning of 2023 was the worst
+-- The rolling total results show that:
+-- 2021 was the best year in terms of layoffs
+-- The end of 2022 and the beginning of 2023 were the worst
 
 select company, Year(`date`),sum(total_laid_off)
 from layoffs_staging2
 group by company, Year(`date`)
 order by company asc;
 
--- this is to see the total laid offs per year of each company
+-- This is to see the total layoffs per year of each company
 
 select company, Year(`date`),sum(total_laid_off)
 from layoffs_staging2
 group by company, Year(`date`)
 order by 3 desc;
 
--- the results show that google had the most lay offs in general in 2023
+-- The results show that Google had the most layoffs in general in 2023
 -- I want to see the top 5 total layoffs per year per company and give them a rank
 -- dense rank was used because some are tied
 
