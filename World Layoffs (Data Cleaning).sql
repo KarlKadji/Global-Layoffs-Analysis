@@ -6,10 +6,10 @@ from layoffs;
 -- 1. Remove Duplicates
 -- 2. Standardize the Data
 -- 3. Null Values or Blank Values
--- 4. Remove Any columns
+-- 4. Remove any columns
 
 
-create table layoffs_staging -- I am creating an editable table to make sure I always have the raw data available just in case
+create table layoffs_staging -- I am creating an editable table to make sure I always have the raw data available, just in case
 like layoffs;
 
 select *
@@ -28,7 +28,7 @@ total_laid_off,
 percentage_laid_off, 
 `date`) as row_num
 from layoffs_staging;
--- using this partition, I assigned every row with a number that will help identify if it is a duplicate or not
+-- using this partition, I assigned every row a number that will help identify if it is a duplicate or not
 -- a row number with 1 is not a duplicate, 2 is a duplicate
 
 with duplicate_cte as 
@@ -45,7 +45,7 @@ country,
 funds_raised_millions) as row_num
 from layoffs_staging
 )
--- I created a CTE to help me identify the duplicates in question. it was important to include every single column to make sure the matches would be identical
+-- I created a CTE to help me identify the duplicates in question. It was important to include every single column to make sure the matches would be identical
 select * 
 from duplicate_cte
 where row_num > 1;
@@ -55,10 +55,10 @@ from layoffs_staging
 where company = 'Casper'
 ;
 
--- this is to double check that the results are accurate
+-- This is to double-check that the results are accurate
 -- to get the below query, right click on layoffs_staging, then copy to clipboard,create statement
 -- I am creating another table to delete the duplicate rows, hence why it must be called layoffs_staging2
--- I added a row_num column and specified the values to be integers, this is so we can filter out the dup rows
+-- I added a row_num column and specified the values to be integers, this is so we can filter out the duplicate rows
 CREATE TABLE `layoffs_staging2` (
   `company` text,
   `location` text,
@@ -76,7 +76,7 @@ select *
 from layoffs_staging2
 ;
 
--- This is to check that the columns appear, it is normal to not see any data at first since we must insert the data from the other table into this one
+-- This is to check that the columns appear; it is normal not to see any data at first, since we must insert the data from the other table into this one
 
 insert into layoffs_staging2
 select *, 
@@ -91,7 +91,7 @@ country,
 funds_raised_millions) as row_num
 from layoffs_staging;
 
--- this is inserting the data from layoffs_staging into layoffs_staging2 with no changes to it, they should be identical at this moment
+-- this is inserting the data from layoffs_staging into layoffs_staging2 with no changes to it; they should be identical at this moment
 
 select *
 from layoffs_staging2
@@ -121,7 +121,7 @@ select *
 from layoffs_staging2
 ;
 
--- now we have deleted all the duplicates from the table, row_num column will be deleted as it is a redundant column of only "1"
+-- Now that we have deleted all the duplicates from the table, the row_num column will be deleted as it is a redundant column of only "1"
 
 -- 2. Standardizing Data
 -- finding issues in the data and fixing them
@@ -138,23 +138,23 @@ select distinct industry
 from layoffs_staging2
 order by 1;
 
--- I filtered out all the disctinct industries and noticed that there are 3 of the same crypto industries in the result.
+-- I filtered out all the distinct industries and noticed that there are 3 of the same crypto industries in the result.
 
 select *
 from layoffs_staging2
 where industry like 'Crypto%';
--- seeing that most results are listed under "Crypto" I will change them all to "Crypto" for consistency+
+-- Seeing that most results are listed under "Crypto", I will change them all to "Crypto" for consistency.
 
 update layoffs_staging2
 set industry = 'Crypto'
 where industry like 'Crypto%';
--- I have updated all of the industry names for the crypto companies to "Crypto"
+-- I have updated all of the industry names for the crypto companies to "Crypto."
 
 select distinct location
 from layoffs_staging2
 order by 1;
 -- I have noticed that the locations with accents show up twice, one with no accent and another with symbols
--- I will update Dusseldorf, FLorianopolis, Malmo
+-- I will update Düsseldorf, Florianopolis, Malmö
 -- I will refrain from using accents for simplicity
 
 update layoffs_staging2 
@@ -172,18 +172,18 @@ where location like 'Malm_';
 select distinct country
 from layoffs_staging2
 order by 1;
--- I notice that there are two united states entries, this must be changed to "United States"
+-- I notice that there are two United States entries; this must be changed to "United States."
 select distinct country, trim(trailing'.' from country)
 from layoffs_staging2
-Order by 1;
--- with the trim function i simply took off the period from the end of the country
+Order by 1.
+-- With the trim function, I simply took off the period from the end of the country
 
 update layoffs_staging2
 set country =  trim(trailing'.' from country)
 where country like 'United States%';
--- i updated the table to reflect the changes
+-- I updated the table to reflect the changes
 
--- we now want to change the dates from a text column to a date column
+-- We now want to change the dates from a text column to a date column
 
 select `date`,
 str_to_date(`date`,'%m/%d/%Y')
@@ -195,12 +195,12 @@ set `date` = str_to_date(`date`,'%m/%d/%Y');
 select `date`
 from layoffs_staging2;
 
--- we have updated the format now, however it is still a text column
+-- We have updated the format now; however, it is still a text column
 
 alter table layoffs_staging2
 modify column `date` date;
 
--- now the column has been changed to a date column. NOTE: do not do this on original dataset
+-- now the column has been changed to a date column. NOTE: Do not do this on the original dataset
 
 select *
 from layoffs_staging2;
@@ -260,8 +260,8 @@ select *
 from layoffs_staging2
 where company like 'Bally%';
 
--- the reason this row did not get update is because it is the only entry by this company
--- this is all the NULL we can replace as the other columns are based off data we cannot replicate or fill in unless we look online for the information
+-- The reason this row did not get updated is that it is the only entry by this company
+-- This is all the NULL we can replace, as the other columns are based on data we cannot replicate or fill in unless we look online for the information
 
 -- 4. Remove any columns/rows
 
